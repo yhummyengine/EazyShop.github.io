@@ -1,0 +1,303 @@
+openapi: 3.0.3
+info:
+  title: Eazy shop Products APIs Definition
+  description: | 
+    ## About Us
+  termsOfService: https://eazyshop.com/terms/
+  contact:
+    name: API Support
+    url: https://www.eazyshop.com/support
+    email: support@eazyshop.com
+  license:
+    name: EazyShop license
+    url: https://www.eazyshop.com/licenses/LICENSE-2.0.html
+  version: 0.0.1
+servers:
+  - url: https://development.eazyshop-server.com/v1
+    description: Development server
+tags:
+  - name: Categories
+    description: Categories-related operations
+  - name: Products
+    description: Products-related operations
+  - name: Orders
+    description: Orders-related operations
+security:
+  - BasicAuth: []
+  - BearerAuth: []
+  - ApiKeyAuth: []
+  - oAuth2AuthCode:
+    - read
+    - write
+    - admin
+paths:
+  /categories:
+    get:
+      tags:
+        - Categories
+      summary: List all categories
+      description: Returns the list of categories supported by EazyShop
+      parameters:
+        - name: categoryId
+          in: query
+          schema:
+            type: integer
+            minimum: 100
+            maximum: 1000
+          example: 101
+      responses:
+        '200':
+          description: A list of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    categoryId:
+                      type: integer
+                    name:
+                      type: string
+  /categories/{categoryId}:
+    get:
+      tags:
+        - Categories
+      summary: get particular category by ID
+      description: return the inputed categoryID
+      parameters:
+        - name: categoryId
+          required: true
+          in: path
+          schema:
+            type: integer
+            minimum: 100
+            maximum: 1000
+          example: 101
+      responses: 
+        '200':
+          description: A particular categoryID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categoryId:
+                    type: integer
+                  name:
+                    type: string
+  /products:
+    get:
+      summary: List all products
+      description: Returns the list of products supported by EazyShop
+      parameters:
+        - name: categoryId
+          in: query
+          schema:
+            type: integer
+            minimum: 100
+            maximum: 1000
+          example: 101
+      responses:
+        '200':
+          description: A list of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    productId:
+                      type: integer
+                    name:
+                      type: string
+                    price:
+                      type: number
+                    categoryName:
+                      type: string
+                    quantity:
+                      type: integer
+  /products/{productId}:
+    get:
+      summary: Return product details
+      description: Returns the product details from EazyShop
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 100
+            maximum: 1000
+          example: 101
+      responses:
+        '200':
+          description: Return product details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  productId:
+                    type: integer
+                  name:
+                    type: string
+                  price:
+                    type: number
+                  categoryName:
+                    type: string
+                  quantity:
+                    type: integer
+  /orders:
+    post: 
+      summary: Create Order
+      description: Post order details to EazyShop for processing and shipping
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                products:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      productId:
+                        type: integer
+                      name: 
+                        type: integer
+                      price:
+                        type: number
+                      categoryname:
+                        type: string
+                      quantity:
+                        type: integer
+                address: 
+                  $ref: "#/components/schemas/Address"
+      responses: 
+        '201':
+          description: Order created successfully
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  orderId:
+                    type: integer 
+    put: 
+      summary: Update Order
+      description: Update order details to EazyShop for processing and shipping
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderId:
+                  type: integer
+                products:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      productId:
+                        type: integer
+                      name: 
+                        type: integer
+                      price:
+                        type: number
+                      categoryname:
+                        type: string
+                      quantity:
+                        type: integer
+                address: 
+                  $ref: "#/components/schemas/Address" 
+      responses: 
+        '200':
+          description: Order details updated successfully
+    delete: 
+      summary: Delete Order
+      description: Delete order details to EazyShop for processing and shipping
+      parameters:
+        - $ref: "#/components/parameters/orderIdQueryParam"
+      responses: 
+        '204':
+          description: Order details cancelled successfully
+    get:
+      summary: Get Order Details 
+      description: Get order details from EazyShop for processing and shipping
+      parameters:
+        - $ref: "#/components/parameters/orderIdQueryParam"
+      responses: 
+        '200':
+          description: Fetch Order details successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orderId:
+                    type: integer
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties: 
+                        productId:
+                          type: integer
+                        name:
+                          type: string
+                        price:
+                          type: number
+                        categoryName:
+                          type: string
+                        quantity:
+                          type: integer
+                  address: 
+                    $ref: "#/components/schemas/Address"
+components:
+  parameters:
+    orderIdQueryParam:
+      name: orderId
+      in: query
+      required: true
+      schema:
+        type: integer
+  schemas:
+    Address: 
+      type: object
+      properties:
+        addressLine:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zipcode: 
+          type: string 
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+    oAuth2AuthCode:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://example.com/oauth/authorize
+          tokenUrl: https://example.com/api/oauth.access
+          scopes:
+            read: Read Only access
+            write: Read Write access
+            admin: Admin access
+       
+       
